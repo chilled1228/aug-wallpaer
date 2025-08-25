@@ -196,7 +196,7 @@ export default function Testimonials({
             </div>
             
             <div className="text-right">
-              <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+              <div className="text-2xl font-bold text-brand">
                 {Math.round((overallStats.distribution[0].count / overallStats.totalReviews) * 100)}%
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -214,7 +214,7 @@ export default function Testimonials({
                 </span>
                 <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
-                    className="bg-yellow-400 h-2 rounded-full transition-all duration-300"
+                    className="bg-brand-accent h-2 rounded-full transition-all duration-300"
                     style={{ width: `${dist.percentage}%` }}
                   />
                 </div>
@@ -261,7 +261,7 @@ export default function Testimonials({
                       {review.user.name}
                     </h4>
                     {review.user.verified && (
-                      <Verified className="w-4 h-4 text-blue-500" />
+                      <Verified className="w-4 h-4 text-brand" />
                     )}
                     {review.user.location && (
                       <span className="text-sm text-gray-500 dark:text-gray-400">

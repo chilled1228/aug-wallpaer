@@ -172,7 +172,7 @@ export class BackgroundSync {
 
     try {
       const registration = await navigator.serviceWorker.ready;
-      await registration.sync.register(tag);
+      await (registration as any).sync.register(tag);
       this.syncTags.add(tag);
       console.log(`Background sync registered: ${tag}`);
     } catch (error) {
@@ -220,7 +220,7 @@ export class PushNotifications {
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey)
+        applicationServerKey: this.urlBase64ToUint8Array(this.vapidPublicKey) as BufferSource
       });
 
       console.log('Push subscription created');

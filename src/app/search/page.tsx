@@ -6,6 +6,7 @@ import { supabase, type Wallpaper } from "@/lib/supabase";
 import Navigation from "@/components/Navigation";
 import WallpaperCard from "@/components/WallpaperCard";
 import SearchInterface from "@/components/SearchInterface";
+import Breadcrumb from "@/components/Breadcrumb";
 import { Analytics } from "@/lib/analytics";
 
 export const metadata = {
@@ -20,7 +21,7 @@ interface SearchPageProps {
 
 interface SearchFilters {
   category?: string;
-  tags?: string;
+  tags?: string[];
   deviceType?: string;
   resolution?: string;
   sortBy?: string;
@@ -49,8 +50,8 @@ async function searchWallpapers(query?: string, filters?: SearchFilters): Promis
     supabaseQuery = supabaseQuery.ilike('resolution', `%${filters.resolution}%`);
   }
 
-  if (filters?.tags) {
-    supabaseQuery = supabaseQuery.contains('tags', [filters.tags]);
+  if (filters?.tags && filters.tags.length > 0) {
+    supabaseQuery = supabaseQuery.contains('tags', filters.tags);
   }
 
   // Apply sorting
@@ -100,15 +101,26 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     deviceType: deviceType || undefined,
     resolution: resolution || undefined,
     sortBy: sortBy || undefined,
-    tags: tags || undefined
+    tags: tags ? tags.split(',').map(tag => tag.trim()) : undefined
   };
 
   const wallpapers = await searchWallpapers(query, filters);
 
+  const breadcrumbItems = [
+    { name: 'Search', href: '/search', current: true }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="bg-gray-50 dark:bg-gray-900">
       {/* Navigation */}
       <Navigation />
+
+      {/* Breadcrumb */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="container-mobile py-4">
+          <Breadcrumb items={breadcrumbItems} />
+        </div>
+      </div>
 
       {/* Search Interface */}
       <SearchInterface

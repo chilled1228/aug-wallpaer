@@ -1,10 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { supabase, type Wallpaper } from "@/lib/supabase";
-import { Home as HomeIcon, Palette, Droplets, Hammer, Star, ArrowRight, TrendingUp, Zap } from "lucide-react";
+import { Home as HomeIcon, Palette, Droplets, Hammer, Star, ArrowRight, TrendingUp, Zap, Download } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import WallpaperCard from "@/components/WallpaperCard";
-import { Analytics } from "@/lib/analytics";
 
 async function getWallpapers(): Promise<Wallpaper[]> {
   const { data, error } = await supabase
@@ -92,60 +90,61 @@ export default async function Home() {
   ]);
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen">
       {/* Navigation */}
       <Navigation />
 
       {/* Hero Section */}
-      <header className="bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="none" fill-rule="evenodd"%3E%3Cg fill="%23ffffff" fill-opacity="0.1"%3E%3Ccircle cx="30" cy="30" r="2"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')]"></div>
-        </div>
-
-        <div className="container-mobile relative">
-          <div className="py-12 md:py-20 text-center">
-            <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6">
-              Premium Digital
-              <span className="block bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
+      <header className="hero-wallpaper text-white relative z-10">
+        <div className="container-mobile relative z-20">
+          <div className="py-20 md:py-32 text-center">
+            <div className="mb-6">
+              <span className="inline-block px-4 py-2 bg-brand-soft text-brand rounded border-2 border-white text-sm font-semibold mb-6">
+                🎨 Premium Wallpaper Collection
+              </span>
+            </div>
+            
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 leading-tight text-white">
+              Download Stunning
+              <span className="block text-brand-soft">
                 Wallpapers
               </span>
             </h1>
-            <p className="text-lg md:text-xl mb-8 max-w-3xl mx-auto opacity-90">
-              Download stunning wallpapers for your desktop, mobile, and tablet.
-              Discover high-quality designs in 4K, HD, and mobile-optimized resolutions.
+            
+            <p className="text-xl md:text-2xl mb-12 max-w-3xl mx-auto opacity-90 leading-relaxed">
+              Discover thousands of high-quality wallpapers for desktop, mobile, and tablet. 
+              From minimalist designs to stunning photography - find your perfect backdrop.
             </p>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Link
                 href="/categories"
-                className="touch-target bg-white text-blue-600 px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors inline-flex items-center justify-center focus-ring"
+                className="btn-download inline-flex items-center justify-center text-lg"
               >
-                Browse Categories
+                <Download className="mr-3 h-5 w-5" />
+                Start Downloading
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
               <Link
                 href="/search"
-                className="touch-target border-2 border-white text-white px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-white hover:text-blue-600 transition-colors focus-ring"
+                className="btn-secondary inline-flex items-center justify-center text-lg border-white text-white hover:bg-white hover:text-brand"
               >
-                Search Wallpapers
+                Search Collection
               </Link>
             </div>
 
-            {/* Quick Stats */}
-            <div className="grid grid-cols-3 gap-4 max-w-md mx-auto text-center">
-              <div>
-                <div className="text-2xl md:text-3xl font-bold">10K+</div>
-                <div className="text-sm opacity-75">Wallpapers</div>
+            <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto">
+              <div className="text-center">
+                <div className="stat-number text-white">25K+</div>
+                <div className="stat-label text-white/70">Wallpapers</div>
               </div>
-              <div>
-                <div className="text-2xl md:text-3xl font-bold">4K</div>
-                <div className="text-sm opacity-75">Quality</div>
+              <div className="text-center">
+                <div className="stat-number text-white">4K</div>
+                <div className="stat-label text-white/70">Ultra HD</div>
               </div>
-              <div>
-                <div className="text-2xl md:text-3xl font-bold">Free</div>
-                <div className="text-sm opacity-75">Downloads</div>
+              <div className="text-center">
+                <div className="stat-number text-white">100%</div>
+                <div className="stat-label text-white/70">Free</div>
               </div>
             </div>
           </div>
@@ -154,16 +153,18 @@ export default async function Home() {
 
       {/* Featured Wallpapers */}
       {featuredWallpapers.length > 0 && (
-        <section className="container-mobile py-12 md:py-16">
-          <div className="text-center mb-8 md:mb-12">
-            <div className="flex items-center justify-center space-x-2 mb-4">
-              <Star className="w-6 h-6 text-yellow-500" />
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                Featured Wallpapers
+        <section className="container-mobile py-16 md:py-24">
+          <div className="text-center mb-12 md:mb-16">
+            <div className="flex items-center justify-center space-x-3 mb-6">
+              <div className="w-8 h-8 bg-brand rounded-lg flex items-center justify-center">
+                <Star className="w-5 h-5 text-white" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-bold text-brand">
+                Featured Collection
               </h2>
             </div>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Hand-picked premium wallpapers for the best experience
+            <p className="text-lg text-brand-accent max-w-2xl mx-auto">
+              Handpicked wallpapers that showcase the finest in digital artistry and photography
             </p>
           </div>
 
@@ -180,51 +181,48 @@ export default async function Home() {
       )}
 
       {/* Quick Navigation */}
-      <section className="bg-white dark:bg-gray-800 py-12 md:py-16">
+      <section className="section-alt py-16 md:py-24">
         <div className="container-mobile">
-          <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <div className="text-center mb-12 md:mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-brand mb-6">
               Browse by Category
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300">
-              Find the perfect wallpaper for your device and style
+            <p className="text-lg text-brand-accent max-w-2xl mx-auto">
+              Discover wallpapers organized by your preferences and device type
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {quickLinks.map((link, index) => {
               const IconComponent = link.icon;
               return (
                 <Link
                   key={index}
                   href={link.href}
-                  className="group bg-gray-50 dark:bg-gray-700 rounded-lg hover:shadow-lg transition-all duration-200 overflow-hidden focus-ring"
+                  className="card-wallpaper group hover:shadow-xl transition-all"
                 >
-                  <div className={`${link.color} p-4 md:p-6 text-center`}>
-                    <IconComponent className="h-8 md:h-12 w-8 md:w-12 text-white mx-auto mb-2 md:mb-4" />
-                    <h3 className="text-lg md:text-xl font-semibold text-white">
+                  <div className="bg-brand-primary p-8 text-center border-b-4 border-brand-accent">
+                    <IconComponent className="h-12 w-12 text-white mx-auto mb-4" />
+                    <h3 className="text-xl font-bold text-white">
                       {link.title}
                     </h3>
                   </div>
-                  <div className="p-4 md:p-6">
-                    <p className="text-gray-600 dark:text-gray-300 mb-4 text-sm md:text-base">
+                  <div className="p-6">
+                    <p className="text-brand-text mb-6 leading-relaxed">
                       {link.description}
                     </p>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white">Popular:</p>
-                      <div className="flex flex-wrap gap-1 md:gap-2">
-                        {link.popular.map((item, idx) => (
-                          <span
-                            key={idx}
-                            className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded-full"
-                          >
-                            {item}
-                          </span>
-                        ))}
-                      </div>
+                    <div className="flex flex-wrap gap-2 mb-6">
+                      {link.popular.map((item, idx) => (
+                        <span
+                          key={idx}
+                          className="tag-category"
+                        >
+                          {item}
+                        </span>
+                      ))}
                     </div>
-                    <div className="mt-4 text-blue-600 dark:text-blue-400 font-medium group-hover:underline flex items-center">
-                      Explore <ArrowRight className="ml-1 h-4 w-4" />
+                    <div className="text-brand font-semibold group-hover:text-brand-accent transition-colors flex items-center">
+                      Explore Collection <ArrowRight className="ml-2 h-4 w-4" />
                     </div>
                   </div>
                 </Link>
@@ -236,24 +234,26 @@ export default async function Home() {
 
       {/* Trending Wallpapers */}
       {trendingWallpapers.length > 0 && (
-        <section className="container-mobile py-12 md:py-16">
-          <div className="flex items-center justify-between mb-8 md:mb-12">
+        <section className="container-mobile py-16 md:py-24">
+          <div className="flex items-center justify-between mb-12 md:mb-16">
             <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <TrendingUp className="w-6 h-6 text-green-500" />
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                  Trending Now
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-brand-accent rounded border-2 border-brand-primary flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-brand-primary" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-brand">
+                  Trending This Week
                 </h2>
               </div>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
-                Most popular wallpapers this week
+              <p className="text-lg text-brand-accent">
+                The most downloaded wallpapers in the past 7 days
               </p>
             </div>
             <Link
               href="/collections"
-              className="hidden md:inline-flex items-center text-blue-600 dark:text-blue-400 font-medium hover:underline focus-ring rounded px-2 py-1"
+              className="btn-soft hidden md:inline-flex items-center"
             >
-              View All
+              View All Trending
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>
@@ -271,40 +271,45 @@ export default async function Home() {
       )}
 
       {/* Latest Wallpapers */}
-      <section className="bg-white dark:bg-gray-800 py-12 md:py-16">
+      <section className="section-alt py-16 md:py-24">
         <div className="container-mobile">
-          <div className="flex items-center justify-between mb-8 md:mb-12">
+          <div className="flex items-center justify-between mb-12 md:mb-16">
             <div>
-              <div className="flex items-center space-x-2 mb-2">
-                <Zap className="w-6 h-6 text-blue-500" />
-                <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
-                  Latest Wallpapers
+              <div className="flex items-center space-x-3 mb-4">
+                <div className="w-8 h-8 bg-brand rounded border-2 border-brand-accent flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-3xl md:text-4xl font-bold text-brand">
+                  Latest Uploads
                 </h2>
               </div>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
-                Discover our newest additions to the collection
+              <p className="text-lg text-brand-accent">
+                Fresh wallpapers added to our collection
               </p>
             </div>
             <Link
               href="/collections"
-              className="hidden md:inline-flex items-center text-blue-600 dark:text-blue-400 font-medium hover:underline focus-ring rounded px-2 py-1"
+              className="btn-soft hidden md:inline-flex items-center"
             >
-              View All
+              Browse All
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>
           </div>
 
           {wallpapers.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Star className="w-8 h-8 text-gray-400" />
+            <div className="text-center py-16">
+              <div className="w-20 h-20 bg-brand-soft rounded border-4 border-brand-accent flex items-center justify-center mx-auto mb-6">
+                <Star className="w-10 h-10 text-brand" />
               </div>
-              <p className="text-gray-500 dark:text-gray-400 text-lg mb-4">
-                No wallpapers available yet
+              <h3 className="text-xl font-bold text-brand mb-4">
+                Coming Soon
+              </h3>
+              <p className="text-brand-accent text-lg mb-6 max-w-md mx-auto">
+                We're curating amazing wallpapers for you. Check back soon!
               </p>
-              <p className="text-gray-400 dark:text-gray-500">
-                Check back soon for amazing new wallpapers!
-              </p>
+              <Link href="/search" className="btn-primary">
+                Explore Categories
+              </Link>
             </div>
           ) : (
             <div className="wallpaper-grid">
@@ -318,45 +323,60 @@ export default async function Home() {
             </div>
           )}
 
-          <div className="text-center mt-8 md:mt-12">
+          <div className="text-center mt-12 md:mt-16">
             <Link
               href="/collections"
-              className="touch-target inline-flex items-center bg-blue-600 text-white px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors focus-ring"
+              className="btn-primary inline-flex items-center text-lg"
             >
-              View All Collections
-              <ArrowRight className="ml-2 h-5 w-5" />
+              Explore All Collections
+              <ArrowRight className="ml-3 h-5 w-5" />
             </Link>
           </div>
         </div>
       </section>
 
       {/* Call to Action */}
-      <section className="bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 py-12 md:py-16">
+      <section className="py-20 md:py-32 bg-brand-primary border-t-4 border-brand-accent">
         <div className="container-mobile text-center">
           <div className="max-w-4xl mx-auto">
-            <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Star className="h-8 w-8 text-white" />
-            </div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-4">
-              Find Your Perfect Wallpaper
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              Ready to Transform Your Device?
             </h2>
-            <p className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto">
-              Browse our extensive collection of high-quality wallpapers for desktop, mobile, and tablet.
-              All wallpapers are available in multiple resolutions for the perfect fit.
+            <p className="text-xl text-brand-soft mb-12 max-w-2xl mx-auto leading-relaxed">
+              Join thousands of users who have already discovered their perfect wallpaper. 
+              Start downloading high-quality designs for free today.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link
                 href="/search"
-                className="touch-target bg-blue-600 text-white px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors focus-ring"
+                className="btn-download inline-flex items-center justify-center text-lg bg-white text-brand hover:bg-brand-surface"
               >
-                Search Wallpapers
+                <Download className="mr-3 h-5 w-5" />
+                Start Downloading Now
               </Link>
               <Link
-                href="/collections"
-                className="touch-target border-2 border-blue-600 text-blue-600 dark:text-blue-400 px-6 md:px-8 py-3 rounded-lg font-semibold hover:bg-blue-600 hover:text-white transition-colors focus-ring"
+                href="/categories"
+                className="btn-secondary inline-flex items-center justify-center text-lg border-white text-white hover:bg-white hover:text-brand"
               >
-                View Collections
+                Browse Categories
+                <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
+            </div>
+            
+            <div className="flex items-center justify-center space-x-8 text-brand-soft">
+              <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded border border-white/20">
+                <Star className="w-5 h-5" />
+                <span>Premium Quality</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded border border-white/20">
+                <Download className="w-5 h-5" />
+                <span>Instant Download</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-white/10 px-4 py-2 rounded border border-white/20">
+                <Zap className="w-5 h-5" />
+                <span>100% Free</span>
+              </div>
             </div>
           </div>
         </div>

@@ -46,7 +46,7 @@ export class CDNService {
   }
 
   // Generate cache headers for different content types
-  static getCacheHeaders(contentType: 'image' | 'static' | 'api'): Record<string, string> {
+  static getCacheHeaders(contentType: 'images' | 'static' | 'api'): Record<string, string> {
     const maxAge = cdnConfig.cacheSettings[contentType];
     
     const headers: Record<string, string> = {
@@ -54,7 +54,7 @@ export class CDNService {
       'Vary': 'Accept-Encoding',
     };
 
-    if (contentType === 'image') {
+    if (contentType === 'images') {
       headers['Cache-Control'] += ', immutable';
     }
 

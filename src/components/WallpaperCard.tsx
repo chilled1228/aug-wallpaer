@@ -110,15 +110,15 @@ export default function WallpaperCard({
   };
 
   return (
-    <div className={`group relative bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 overflow-hidden wallpaper-card ${className}`}>
+    <div className={`card-wallpaper group relative ${className}`}>
       {/* Image Container */}
       <Link href={`/wallpaper/${wallpaper.id}`} className="block">
-        <div className="relative aspect-portrait overflow-hidden">
+        <div className="relative aspect-portrait overflow-hidden rounded-t">
           <Image
             src={wallpaper.image_url}
             alt={wallpaper.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300 lazy-loading"
+            className="object-cover group-hover:scale-110 transition-transform duration-500 lazy-loading"
             sizes={CDNService.generateSizesAttribute()}
             priority={priority}
             quality={85}
@@ -133,51 +133,69 @@ export default function WallpaperCard({
           />
           
           {/* Overlay with actions */}
-          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <div className="flex space-x-2">
+          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300">
+            <div className="absolute bottom-4 left-4 right-4 flex justify-between items-end">
+              <div className="flex space-x-2">
+                <FavoriteButton
+                  wallpaperId={wallpaper.id}
+                  size="sm"
+                  onAuthRequired={() => {
+                    // Handle auth required - could open auth modal
+                    console.log('Authentication required for favorites');
+                  }}
+                />
+                
+                <QuickShareButton
+                  wallpaper={{
+                    id: wallpaper.id,
+                    title: wallpaper.title,
+                    image_url: wallpaper.image_url,
+                    category: wallpaper.category
+                  }}
+                  size="sm"
+                />
+              </div>
+              
               <button
                 onClick={(e) => handleDownload(e)}
                 disabled={isLoading}
-                className="touch-target bg-white bg-opacity-90 hover:bg-opacity-100 text-gray-900 rounded-full p-2 transition-all duration-200 focus-ring"
+                className="btn-download flex items-center space-x-2 text-sm py-2 px-3"
                 aria-label="Download wallpaper"
               >
                 <Download className="w-4 h-4" />
+                <span>Download</span>
               </button>
-              
-              <FavoriteButton
-                wallpaperId={wallpaper.id}
-                size="sm"
-                onAuthRequired={() => {
-                  // Handle auth required - could open auth modal
-                  console.log('Authentication required for favorites');
-                }}
-              />
-              
-              <QuickShareButton
-                wallpaper={{
-                  id: wallpaper.id,
-                  title: wallpaper.title,
-                  image_url: wallpaper.image_url,
-                  category: wallpaper.category
-                }}
-                size="sm"
-              />
             </div>
           </div>
 
           {/* Category badge */}
-          <div className="absolute top-2 left-2">
-            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-black bg-opacity-50 text-white">
+          <div className="absolute top-3 left-3">
+            <span className="tag-category bg-brand-soft text-brand border-2 border-white">
               {wallpaper.category}
             </span>
           </div>
 
-          {/* Device type indicator */}
-          {wallpaper.device_type && (
-            <div className="absolute top-2 right-2">
-              <span className="inline-flex items-center space-x-1 px-2 py-1 rounded-full text-xs font-medium bg-black bg-opacity-50 text-white">
+          {/* Resolution & Device badges */}
+          <div className="absolute top-3 right-3 flex flex-col space-y-2">
+            {wallpaper.resolution && (
+              <span className="badge-resolution">
+                {wallpaper.resolution}
+              </span>
+            )}
+            {wallpaper.device_type && (
+              <span className="badge-featured flex items-center space-x-1">
                 {getDeviceIcon(wallpaper.device_type)}
-                <span className="capitalize">{wallpaper.device_type}</span>
+                <span className="capitalize text-xs">{wallpaper.device_type}</span>
+              </span>
+            )}
+          </div>
+
+          {/* Featured indicator */}
+          {wallpaper.featured && (
+            <div className="absolute top-3 left-1/2 transform -translate-x-1/2">
+              <span className="badge-featured flex items-center space-x-1">
+                <Star className="w-3 h-3" />
+                <span>Featured</span>
               </span>
             </div>
           )}
@@ -185,33 +203,33 @@ export default function WallpaperCard({
       </Link>
 
       {/* Card Content */}
-      <div className="p-4">
+      <div className="p-5">
         <Link href={`/wallpaper/${wallpaper.id}`}>
-          <h3 className="font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200 line-clamp-2">
+          <h3 className="font-bold text-brand group-hover:text-brand-accent transition-colors duration-200 line-clamp-2 text-lg mb-2">
             {wallpaper.title}
           </h3>
         </Link>
         
         {wallpaper.description && (
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1 line-clamp-2">
+          <p className="text-sm text-brand-text/70 mt-1 line-clamp-2 mb-3">
             {wallpaper.description}
           </p>
         )}
 
         {/* Tags */}
         {wallpaper.tags && wallpaper.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mt-2">
+          <div className="flex flex-wrap gap-2 mb-4">
             {wallpaper.tags.slice(0, 3).map((tag) => (
               <span
                 key={tag}
-                className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full"
+                className="tag-category text-xs"
               >
                 #{tag}
               </span>
             ))}
             {wallpaper.tags.length > 3 && (
-              <span className="text-xs text-gray-500 dark:text-gray-400 px-2 py-1">
-                +{wallpaper.tags.length - 3}
+              <span className="text-xs text-brand-accent px-2 py-1">
+                +{wallpaper.tags.length - 3} more
               </span>
             )}
           </div>
@@ -219,20 +237,21 @@ export default function WallpaperCard({
 
         {/* Social Proof and Stats */}
         {showStats && (
-          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+          <div className="mt-4 pt-4 border-t border-brand-surface">
             <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <SocialProof
-                  wallpaper={{
-                    id: wallpaper.id,
-                    title: wallpaper.title,
-                    download_count: wallpaper.download_count,
-                    average_rating: wallpaper.average_rating,
-                    created_at: wallpaper.created_at
-                  }}
-                  showTrending={true}
-                  showRecentActivity={false}
-                />
+              <div className="flex items-center space-x-4 text-sm text-brand-accent">
+                {wallpaper.download_count && (
+                  <div className="flex items-center space-x-1">
+                    <Download className="w-3 h-3" />
+                    <span>{wallpaper.download_count.toLocaleString()}</span>
+                  </div>
+                )}
+                {wallpaper.average_rating && (
+                  <div className="flex items-center space-x-1">
+                    <Star className="w-3 h-3 text-brand-soft" />
+                    <span>{wallpaper.average_rating.toFixed(1)}</span>
+                  </div>
+                )}
               </div>
 
               {/* Quick download button */}
@@ -240,7 +259,7 @@ export default function WallpaperCard({
                 wallpaper={wallpaper}
                 variant="icon"
                 showOptions={false}
-                className="opacity-75 hover:opacity-100 ml-2"
+                className="opacity-75 hover:opacity-100"
               />
             </div>
           </div>
@@ -249,8 +268,8 @@ export default function WallpaperCard({
 
       {/* Loading overlay */}
       {isLoading && (
-        <div className="absolute inset-0 bg-white bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="absolute inset-0 bg-brand-surface border-4 border-brand-accent flex items-center justify-center rounded">
+          <div className="animate-spin rounded-full h-8 w-8 border-4 border-brand-soft border-t-brand"></div>
         </div>
       )}
     </div>
@@ -260,21 +279,21 @@ export default function WallpaperCard({
 // Skeleton loader for wallpaper cards
 export function WallpaperCardSkeleton({ className = '' }: { className?: string }) {
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden animate-pulse ${className}`}>
-      <div className="aspect-portrait bg-gray-200 dark:bg-gray-700" />
-      <div className="p-4">
-        <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
-        <div className="flex space-x-1 mt-2">
-          <div className="h-6 w-12 bg-gray-200 dark:bg-gray-700 rounded-full" />
-          <div className="h-6 w-16 bg-gray-200 dark:bg-gray-700 rounded-full" />
+    <div className={`card-wallpaper loading-shimmer ${className}`}>
+      <div className="aspect-portrait bg-brand-surface rounded-t-2xl" />
+      <div className="p-5">
+        <div className="h-5 bg-brand-surface rounded mb-3" />
+        <div className="h-3 bg-brand-surface rounded w-3/4 mb-4" />
+        <div className="flex space-x-2 mb-4">
+          <div className="h-6 w-12 bg-brand-surface rounded-full" />
+          <div className="h-6 w-16 bg-brand-surface rounded-full" />
         </div>
-        <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
-          <div className="flex space-x-3">
-            <div className="h-3 w-8 bg-gray-200 dark:bg-gray-700 rounded" />
-            <div className="h-3 w-8 bg-gray-200 dark:bg-gray-700 rounded" />
+        <div className="flex items-center justify-between pt-4 border-t border-brand-surface">
+          <div className="flex space-x-4">
+            <div className="h-3 w-8 bg-brand-surface rounded" />
+            <div className="h-3 w-8 bg-brand-surface rounded" />
           </div>
-          <div className="h-6 w-6 bg-gray-200 dark:bg-gray-700 rounded" />
+          <div className="h-6 w-6 bg-brand-surface rounded" />
         </div>
       </div>
     </div>

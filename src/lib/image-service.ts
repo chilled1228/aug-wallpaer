@@ -56,7 +56,7 @@ export class ImageService {
       const uploadCommand = new PutObjectCommand({
         Bucket: config.storage.bucketName,
         Key: originalKey,
-        Body: await file.arrayBuffer(),
+        Body: new Uint8Array(await file.arrayBuffer()),
         ContentType: file.type,
         Metadata: {
           category,

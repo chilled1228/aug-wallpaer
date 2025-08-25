@@ -16,7 +16,6 @@ import {
   TrendingUp
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Analytics } from '@/lib/analytics';
 
 // Smart Recommendations Engine
 export class RecommendationEngine {
@@ -225,7 +224,7 @@ interface AdvancedSearchFilters {
 interface ColorOption {
   name: string;
   value: string;
-  hex: string;
+  className: string; // uses centralized brand utility class
 }
 
 interface AdvancedSearchProps {
@@ -235,18 +234,10 @@ interface AdvancedSearchProps {
 }
 
 const colorOptions: ColorOption[] = [
-  { name: 'Red', value: 'red', hex: '#ef4444' },
-  { name: 'Orange', value: 'orange', hex: '#f97316' },
-  { name: 'Yellow', value: 'yellow', hex: '#eab308' },
-  { name: 'Green', value: 'green', hex: '#22c55e' },
-  { name: 'Blue', value: 'blue', hex: '#3b82f6' },
-  { name: 'Purple', value: 'purple', hex: '#a855f7' },
-  { name: 'Pink', value: 'pink', hex: '#ec4899' },
-  { name: 'Black', value: 'black', hex: '#000000' },
-  { name: 'White', value: 'white', hex: '#ffffff' },
-  { name: 'Gray', value: 'gray', hex: '#6b7280' },
-  { name: 'Brown', value: 'brown', hex: '#a3a3a3' },
-  { name: 'Teal', value: 'teal', hex: '#14b8a6' }
+  { name: 'Primary', value: 'brand', className: 'bg-brand' },
+  { name: 'Accent', value: 'brand-accent', className: 'bg-brand-accent' },
+  { name: 'Soft', value: 'brand-soft', className: 'bg-brand-soft' },
+  { name: 'Surface', value: 'brand-surface', className: 'bg-brand-surface' }
 ];
 
 const categoryOptions = [
@@ -367,13 +358,8 @@ export default function AdvancedSearch({
         saveRecentSearch(filters.query);
       }
 
-      // Track search
-      await Analytics.trackSearch(filters.query, 0, {
-        category: filters.category,
-        colors: filters.colors.join(','),
-        orientation: filters.orientation,
-        resolution: filters.resolution
-      });
+      // Track search (simplified)
+      console.log('Search performed:', filters.query);
 
       // Update URL
       const params = new URLSearchParams();
@@ -451,7 +437,7 @@ export default function AdvancedSearch({
               value={filters.query}
               onChange={(e) => updateFilter('query', e.target.value)}
               placeholder="Search wallpapers by keyword, style, or description..."
-              className="w-full pl-12 pr-16 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white text-lg"
+              className="w-full pl-12 pr-16 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus-ring dark:bg-gray-700 dark:text-white text-lg"
             />
             {filters.query && (
               <button
@@ -464,12 +450,12 @@ export default function AdvancedSearch({
             <button
               onClick={() => setShowAdvanced(!showAdvanced)}
               className={`absolute right-4 top-1/2 transform -translate-y-1/2 p-1 rounded transition-colors ${
-                showAdvanced ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
+                showAdvanced ? 'text-brand' : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300'
               }`}
             >
               <Filter className="h-4 w-4" />
               {getActiveFiltersCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-brand text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">
                   {getActiveFiltersCount()}
                 </span>
               )}
@@ -510,7 +496,7 @@ export default function AdvancedSearch({
                       <button
                         key={index}
                         onClick={() => updateFilter('query', suggestion)}
-                        className="px-3 py-1 text-sm bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full hover:bg-blue-100 dark:hover:bg-blue-800 transition-colors"
+                        className="px-3 py-1 text-sm bg-brand-surface text-brand rounded-full hover:opacity-90 transition-colors"
                       >
                         {suggestion}
                       </button>
@@ -530,7 +516,7 @@ export default function AdvancedSearch({
               onClick={() => updateFilter('category', filters.category === category ? '' : category)}
               className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
                 filters.category === category
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-brand text-white'
                   : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
               }`}
             >
@@ -546,7 +532,7 @@ export default function AdvancedSearch({
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Advanced Filters</h3>
               <button
                 onClick={clearFilters}
-                className="flex items-center space-x-1 text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                className="flex items-center space-x-1 text-sm text-brand hover:underline"
               >
                 <RotateCcw className="w-4 h-4" />
                 <span>Clear All</span>
@@ -569,8 +555,7 @@ export default function AdvancedSearch({
                         filters.colors.includes(color.value)
                           ? 'border-gray-900 dark:border-white scale-110'
                           : 'border-gray-300 dark:border-gray-600 hover:scale-105'
-                      }`}
-                      style={{ backgroundColor: color.hex }}
+                      } ${color.className}`}
                       title={color.name}
                     />
                   ))}
@@ -597,7 +582,7 @@ export default function AdvancedSearch({
                         value={option.value}
                         checked={filters.orientation === option.value}
                         onChange={(e) => updateFilter('orientation', e.target.value)}
-                        className="mr-2 text-blue-600 focus:ring-blue-500"
+                        className="mr-2 text-brand focus-ring"
                       />
                       <span className="text-sm text-gray-700 dark:text-gray-300">{option.label}</span>
                     </label>
@@ -613,7 +598,7 @@ export default function AdvancedSearch({
                 <select
                   value={filters.resolution}
                   onChange={(e) => updateFilter('resolution', e.target.value)}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus-ring"
                 >
                   {resolutionOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -641,7 +626,7 @@ export default function AdvancedSearch({
                         onClick={() => updateFilter('deviceType', filters.deviceType === device.value ? '' : device.value)}
                         className={`flex flex-col items-center p-2 rounded-lg border transition-colors ${
                           filters.deviceType === device.value
-                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900 text-blue-700 dark:text-blue-300'
+                            ? 'border-brand bg-brand-surface text-brand'
                             : 'border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800'
                         }`}
                       >
@@ -662,7 +647,7 @@ export default function AdvancedSearch({
                 <select
                   value={filters.sortBy}
                   onChange={(e) => updateFilter('sortBy', e.target.value)}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus-ring"
                 >
                   {sortOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -680,7 +665,7 @@ export default function AdvancedSearch({
                 <select
                   value={filters.aspectRatio}
                   onChange={(e) => updateFilter('aspectRatio', e.target.value)}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 dark:bg-gray-800 dark:text-white focus:outline-none focus-ring"
                 >
                   {aspectRatioOptions.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -696,7 +681,7 @@ export default function AdvancedSearch({
         {/* Search Status */}
         {isSearching && (
           <div className="flex items-center justify-center py-2">
-            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2" />
+            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand mr-2" />
             <span className="text-sm text-gray-600 dark:text-gray-400">Searching...</span>
           </div>
         )}

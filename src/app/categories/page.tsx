@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Home, Palette, Droplets, Hammer, ArrowRight, Grid3X3 } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import Breadcrumb from "@/components/Breadcrumb";
 
 export const metadata = {
   title: "Wallpaper Categories | Browse by Device, Style, Color & Resolution",
@@ -58,10 +59,21 @@ const categories = {
 };
 
 export default function CategoriesPage() {
+  const breadcrumbItems = [
+    { name: 'Categories', href: '/categories', current: true }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="bg-gray-50 dark:bg-gray-900">
       {/* Navigation */}
       <Navigation />
+
+      {/* Breadcrumb */}
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+        <div className="container-mobile py-4">
+          <Breadcrumb items={breadcrumbItems} />
+        </div>
+      </div>
 
       {/* Header */}
       <header className="bg-gradient-to-br from-blue-600 to-purple-600 text-white">

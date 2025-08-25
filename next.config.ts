@@ -31,13 +31,12 @@ const nextConfig: NextConfig = {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [400, 640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384, 512],
+    qualities: [50, 75, 85, 90, 95, 100],
     minimumCacheTTL: 31536000, // 1 year
     dangerouslyAllowSVG: false,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     // Enable blur placeholder generation
     unoptimized: false,
-    // Quality settings
-    quality: 85,
     // Loader configuration for custom CDN
     loader: 'default',
   },

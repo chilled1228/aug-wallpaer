@@ -1,15 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { 
   Download, 
-  Smartphone, 
   Monitor, 
-  Tablet, 
   Check, 
-  AlertCircle,
-  ExternalLink,
-  Share2
+  AlertCircle
 } from 'lucide-react';
 import { Analytics } from '@/lib/analytics';
 import { CDNService } from '@/lib/cdn-config';
@@ -33,71 +29,26 @@ interface DownloadButtonProps {
   };
   className?: string;
   variant?: 'primary' | 'secondary' | 'icon';
-  showOptions?: boolean;
 }
 
 export default function DownloadButton({ 
   wallpaper, 
   className = '', 
-  variant = 'primary',
-  showOptions = true 
+  variant = 'primary'
 }: DownloadButtonProps) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [showDropdown, setShowDropdown] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState<'idle' | 'success' | 'error'>('idle');
-  const downloadRef = useRef<HTMLAnchorElement>(null);
 
-  // Download options based on device type and common resolutions
+  // Download options - only original quality
   const downloadOptions: DownloadOption[] = [
-    {
-      label: 'Mobile (Portrait)',
-      resolution: '1080x1920',
-      width: 1080,
-      height: 1920,
-      size: '~800KB',
-      device: 'mobile',
-      recommended: isMobileDevice()
-    },
-    {
-      label: 'Mobile (Landscape)',
-      resolution: '1920x1080',
-      width: 1920,
-      height: 1080,
-      size: '~900KB',
-      device: 'mobile'
-    },
-    {
-      label: 'Tablet',
-      resolution: '1536x2048',
-      width: 1536,
-      height: 2048,
-      size: '~1.2MB',
-      device: 'tablet'
-    },
-    {
-      label: 'Desktop HD',
-      resolution: '1920x1080',
-      width: 1920,
-      height: 1080,
-      size: '~1.5MB',
-      device: 'desktop',
-      recommended: !isMobileDevice()
-    },
-    {
-      label: 'Desktop 4K',
-      resolution: '3840x2160',
-      width: 3840,
-      height: 2160,
-      size: '~3MB',
-      device: 'desktop'
-    },
     {
       label: 'Original Quality',
       resolution: 'Original',
       width: 0,
       height: 0,
       size: '~5MB',
-      device: 'desktop'
+      device: 'desktop',
+      recommended: true
     }
   ];
 
@@ -107,34 +58,25 @@ export default function DownloadButton({
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   }
 
-  // Get device icon
-  const getDeviceIcon = (device: string) => {
-    switch (device) {
-      case 'mobile':
-        return <Smartphone className="w-4 h-4" />;
-      case 'tablet':
-        return <Tablet className="w-4 h-4" />;
-      case 'desktop':
-        return <Monitor className="w-4 h-4" />;
-      default:
-        return <Download className="w-4 h-4" />;
-    }
-  };
-
   // Handle download with specific resolution
   const handleDownload = async (option?: DownloadOption) => {
     setIsDownloading(true);
     setDownloadStatus('idle');
 
     try {
+      // Validate wallpaper URL
+      if (!wallpaper.image_url) {
+        throw new Error('Wallpaper image URL is not available');
+      }
+
       // Track download attempt
       await Analytics.trackDownload(
-        wallpaper.id, 
+        wallpaper.id,
         option?.resolution || 'default'
       );
 
       let downloadUrl = wallpaper.image_url;
-      
+
       // Generate optimized URL if specific resolution requested
       if (option && option.width > 0) {
         downloadUrl = CDNService.getOptimizedImageUrl(wallpaper.image_url, {
@@ -145,19 +87,35 @@ export default function DownloadButton({
         });
       }
 
+      // Test if the URL is accessible
+      try {
+        const response = await fetch(downloadUrl, { method: 'HEAD' });
+        if (!response.ok) {
+          throw new Error(`Image not accessible: ${response.status}`);
+        }
+      } catch (fetchError) {
+        console.warn('Could not verify image accessibility, proceeding with download:', fetchError);
+      }
+
       // Create download link
       const link = document.createElement('a');
       link.href = downloadUrl;
       link.download = generateFileName(option);
       link.style.display = 'none';
-      
+
+      // Add error handling for download link
+      link.onerror = () => {
+        setDownloadStatus('error');
+        console.error('Download link failed');
+      };
+
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
 
       // Show success state
       setDownloadStatus('success');
-      
+
       // Try to set as wallpaper on mobile
       if (isMobileDevice() && 'setAsWallpaper' in navigator) {
         try {
@@ -174,6 +132,11 @@ export default function DownloadButton({
     } catch (error) {
       console.error('Download failed:', error);
       setDownloadStatus('error');
+
+      // Show user-friendly error message
+      if (error instanceof Error) {
+        console.error('Download error details:', error.message);
+      }
     } finally {
       setIsDownloading(false);
       
@@ -204,31 +167,6 @@ export default function DownloadButton({
     
     // You could show a toast notification here
     console.log(instructions);
-  };
-
-  // Handle share functionality
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: wallpaper.title,
-          text: `Check out this amazing wallpaper: ${wallpaper.title}`,
-          url: `${window.location.origin}/wallpaper/${wallpaper.id}`
-        });
-      } catch (error) {
-        console.error('Share failed:', error);
-      }
-    } else {
-      // Fallback to clipboard
-      try {
-        await navigator.clipboard.writeText(
-          `${window.location.origin}/wallpaper/${wallpaper.id}`
-        );
-        // Show copied notification
-      } catch (error) {
-        console.error('Copy failed:', error);
-      }
-    }
   };
 
   // Get button content based on status
@@ -292,113 +230,14 @@ export default function DownloadButton({
     }
   };
 
-  if (!showOptions) {
-    // Simple download button without options
-    return (
-      <button
-        onClick={() => handleDownload()}
-        disabled={isDownloading}
-        className={`${getButtonStyles()} ${className}`}
-      >
-        {getButtonContent()}
-      </button>
-    );
-  }
-
+  // Simple download button - only original quality available
   return (
-    <div className={`relative ${className}`}>
-      {/* Main download button */}
-      <div className="flex">
-        <button
-          onClick={() => handleDownload(downloadOptions.find(opt => opt.recommended))}
-          disabled={isDownloading}
-          className={`${getButtonStyles()} ${showOptions ? 'rounded-r-none' : ''}`}
-        >
-          {getButtonContent()}
-        </button>
-
-        {/* Options dropdown trigger */}
-        {showOptions && (
-          <button
-            onClick={() => setShowDropdown(!showDropdown)}
-            disabled={isDownloading}
-            className={`${getButtonStyles()} rounded-l-none border-l border-white border-opacity-20 px-2`}
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </button>
-        )}
-      </div>
-
-      {/* Download options dropdown */}
-      {showDropdown && (
-        <div className="absolute top-full left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 z-50">
-          <div className="p-2">
-            <div className="text-sm font-medium text-gray-900 dark:text-white mb-2 px-2">
-              Choose Resolution
-            </div>
-            
-            {downloadOptions.map((option, index) => (
-              <button
-                key={index}
-                onClick={() => handleDownload(option)}
-                className="w-full flex items-center justify-between p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors text-left"
-              >
-                <div className="flex items-center space-x-3">
-                  {getDeviceIcon(option.device)}
-                  <div>
-                    <div className="text-sm font-medium text-gray-900 dark:text-white">
-                      {option.label}
-                      {option.recommended && (
-                        <span className="ml-2 text-xs bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-0.5 rounded-full">
-                          Recommended
-                        </span>
-                      )}
-                    </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">
-                      {option.resolution} • {option.size}
-                    </div>
-                  </div>
-                </div>
-                <Download className="w-4 h-4 text-gray-400" />
-              </button>
-            ))}
-
-            {/* Additional actions */}
-            <div className="border-t border-gray-200 dark:border-gray-600 mt-2 pt-2">
-              <button
-                onClick={handleShare}
-                className="w-full flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors text-left"
-              >
-                <Share2 className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-700 dark:text-gray-300">Share Wallpaper</span>
-              </button>
-              
-              {isMobileDevice() && (
-                <button
-                  onClick={() => {
-                    handleDownload(downloadOptions.find(opt => opt.recommended));
-                    showSetWallpaperInstructions();
-                  }}
-                  className="w-full flex items-center space-x-3 p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors text-left"
-                >
-                  <ExternalLink className="w-4 h-4 text-gray-500" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">Set as Wallpaper</span>
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Click outside to close dropdown */}
-      {showDropdown && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={() => setShowDropdown(false)}
-        />
-      )}
-    </div>
+    <button
+      onClick={() => handleDownload(downloadOptions[0])}
+      disabled={isDownloading}
+      className={`${getButtonStyles()} ${className}`}
+    >
+      {getButtonContent()}
+    </button>
   );
 }

@@ -59,7 +59,7 @@ export class AuthService {
   // Sign in with email and password
   static async signIn(email: string, password: string) {
     try {
-      const { data, error } = await this.supabase.auth.signInWithPassword({
+      const { data, error } = await this.supabaseClient.auth.signInWithPassword({
         email,
         password
       });
@@ -81,7 +81,7 @@ export class AuthService {
   // Sign in with OAuth providers
   static async signInWithProvider(provider: 'google' | 'github' | 'facebook') {
     try {
-      const { data, error } = await this.supabase.auth.signInWithOAuth({
+      const { data, error } = await this.supabaseClient.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`
@@ -99,7 +99,7 @@ export class AuthService {
   // Sign out
   static async signOut() {
     try {
-      const { error } = await this.supabase.auth.signOut();
+      const { error } = await this.supabaseClient.auth.signOut();
       if (error) throw error;
       return { error: null };
     } catch (error) {
@@ -111,7 +111,7 @@ export class AuthService {
   // Get current user
   static async getCurrentUser(): Promise<User | null> {
     try {
-      const { data: { user } } = await this.supabase.auth.getUser();
+      const { data: { user } } = await this.supabaseClient.auth.getUser();
       return user;
     } catch (error) {
       console.error('Get current user error:', error);
@@ -122,7 +122,7 @@ export class AuthService {
   // Get current session
   static async getCurrentSession(): Promise<Session | null> {
     try {
-      const { data: { session } } = await this.supabase.auth.getSession();
+      const { data: { session } } = await this.supabaseClient.auth.getSession();
       return session;
     } catch (error) {
       console.error('Get current session error:', error);
@@ -157,7 +157,7 @@ export class AuthService {
         }
       };
 
-      const { error } = await this.supabase
+      const { error } = await this.supabaseClient
         .from('user_profiles')
         .insert([profile]);
 
@@ -170,7 +170,7 @@ export class AuthService {
   // Get user profile
   static async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('user_profiles')
         .select('*')
         .eq('id', userId)
@@ -187,7 +187,7 @@ export class AuthService {
   // Update user profile
   static async updateUserProfile(userId: string, updates: Partial<UserProfile>) {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('user_profiles')
         .update(updates)
         .eq('id', userId)
@@ -205,10 +205,10 @@ export class AuthService {
   // Update last active timestamp
   private static async updateLastActive(userId: string) {
     try {
-      await this.supabase
+      await this.supabaseClient
         .from('user_profiles')
-        .update({ 
-          'stats.lastActiveAt': new Date().toISOString() 
+        .update({
+          'stats.lastActiveAt': new Date().toISOString()
         })
         .eq('id', userId);
     } catch (error) {
@@ -219,7 +219,7 @@ export class AuthService {
   // Reset password
   static async resetPassword(email: string) {
     try {
-      const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      const { error } = await this.supabaseClient.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/auth/reset-password`
       });
 
@@ -234,7 +234,7 @@ export class AuthService {
   // Update password
   static async updatePassword(newPassword: string) {
     try {
-      const { error } = await this.supabase.auth.updateUser({
+      const { error } = await this.supabaseClient.auth.updateUser({
         password: newPassword
       });
 
@@ -248,7 +248,7 @@ export class AuthService {
 
   // Listen to auth state changes
   static onAuthStateChange(callback: (event: string, session: Session | null) => void) {
-    return this.supabase.auth.onAuthStateChange(callback);
+    return this.supabaseClient.auth.onAuthStateChange(callback);
   }
 
   // Check if user is authenticated
@@ -260,7 +260,7 @@ export class AuthService {
   // Get user permissions
   static async getUserPermissions(userId: string): Promise<string[]> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('user_permissions')
         .select('permission')
         .eq('user_id', userId);
@@ -282,12 +282,12 @@ export class AuthService {
 
 // Favorites service
 export class FavoritesService {
-  private static supabase = createClientComponentClient();
+  private static supabaseClient = supabase;
 
   // Add wallpaper to favorites
   static async addToFavorites(userId: string, wallpaperId: string) {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('user_favorites')
         .insert([{
           user_id: userId,
@@ -312,7 +312,7 @@ export class FavoritesService {
   // Remove wallpaper from favorites
   static async removeFromFavorites(userId: string, wallpaperId: string) {
     try {
-      const { error } = await this.supabase
+      const { error } = await this.supabaseClient
         .from('user_favorites')
         .delete()
         .eq('user_id', userId)
@@ -333,7 +333,7 @@ export class FavoritesService {
   // Check if wallpaper is favorited
   static async isFavorited(userId: string, wallpaperId: string): Promise<boolean> {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('user_favorites')
         .select('id')
         .eq('user_id', userId)
@@ -349,7 +349,7 @@ export class FavoritesService {
   // Get user's favorite wallpapers
   static async getUserFavorites(userId: string, limit: number = 20, offset: number = 0) {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('user_favorites')
         .select(`
           wallpaper_id,
@@ -381,12 +381,12 @@ export class FavoritesService {
   // Update favorite count in user stats
   private static async updateFavoriteCount(userId: string) {
     try {
-      const { count } = await this.supabase
+      const { count } = await this.supabaseClient
         .from('user_favorites')
         .select('*', { count: 'exact', head: true })
         .eq('user_id', userId);
 
-      await this.supabase
+      await this.supabaseClient
         .from('user_profiles')
         .update({ 'stats.favoriteCount': count || 0 })
         .eq('id', userId);
@@ -398,7 +398,7 @@ export class FavoritesService {
   // Get favorite statistics
   static async getFavoriteStats(userId: string) {
     try {
-      const { data, error } = await this.supabase
+      const { data, error } = await this.supabaseClient
         .from('user_favorites')
         .select(`
           wallpapers (category)
@@ -409,7 +409,7 @@ export class FavoritesService {
 
       // Calculate category distribution
       const categoryStats: Record<string, number> = {};
-      data.forEach(fav => {
+      data.forEach((fav: any) => {
         const category = fav.wallpapers?.category;
         if (category) {
           categoryStats[category] = (categoryStats[category] || 0) + 1;

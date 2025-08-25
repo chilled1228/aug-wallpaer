@@ -1,21 +1,29 @@
 @import "tailwindcss";
 
 :root {
+  /* Base */
   --background: #ffffff;
   --foreground: #171717;
+
+  /* Brand palette */
+  --brand-primary: #1C352D; /* rgb(28,53,45) */
+  --brand-accent: #A6B28B;  /* rgb(166,178,139) */
+  --brand-soft: #F5C9B0;    /* rgb(245,201,176) */
+  --brand-surface: #F9F6F3; /* rgb(249,246,243) */
+
+  /* Semantic tokens derived from brand */
+  --brand-text: #10201b;
+  --brand-ring: var(--brand-accent);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* Tailwind v4 tokens can be handled via CSS variables above.
+   Removed @theme to avoid Unknown at rule errors from non-Tailwind parsers. */
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --brand-text: #eaf3ef;
   }
 }
 
@@ -181,8 +189,219 @@ html {
 
 /* Focus styles for accessibility */
 .focus-ring:focus {
-  outline: 2px solid #3b82f6;
+  outline: 2px solid var(--brand-ring);
   outline-offset: 2px;
+}
+
+/* === BRAND DESIGN SYSTEM === */
+
+/* Brand Color Utilities */
+.bg-brand { background-color: var(--brand-primary); }
+.bg-brand-accent { background-color: var(--brand-accent); }
+.bg-brand-soft { background-color: var(--brand-soft); }
+.bg-brand-surface { background-color: var(--brand-surface); }
+.text-brand { color: var(--brand-primary); }
+.text-brand-accent { color: var(--brand-accent); }
+.text-brand-soft { color: var(--brand-soft); }
+.text-brand-contrast { color: var(--brand-text); }
+.border-brand { border-color: var(--brand-primary); }
+.ring-brand { box-shadow: 0 0 0 2px var(--brand-ring); }
+
+/* Hero Section */
+.hero-wallpaper {
+  background: var(--brand-primary);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Navigation */
+.nav-brand {
+  background: white;
+  border-bottom: 2px solid var(--brand-surface);
+}
+
+.nav-brand.dark {
+  background: var(--brand-text);
+  border-bottom: 2px solid var(--brand-accent);
+}
+
+/* Cards & Components */
+.card-wallpaper {
+  background: white;
+  border: 2px solid var(--brand-surface);
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.card-wallpaper:hover {
+  border-color: var(--brand-accent);
+  background: var(--brand-surface);
+}
+
+.card-wallpaper.dark {
+  background: var(--brand-text);
+  border-color: var(--brand-accent);
+}
+
+/* Buttons */
+.btn-primary {
+  background: var(--brand-primary);
+  color: white;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: #153129;
+}
+
+.btn-secondary {
+  background: white;
+  color: var(--brand-primary);
+  border: 2px solid var(--brand-primary);
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: var(--brand-primary);
+  color: white;
+}
+
+.btn-soft {
+  background: var(--brand-soft);
+  color: var(--brand-primary);
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-soft:hover {
+  background: #f0bb9a;
+}
+
+/* Download Button Special */
+.btn-download {
+  background: var(--brand-accent);
+  color: var(--brand-primary);
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-weight: 700;
+  transition: background-color 0.2s ease;
+  border: 2px solid var(--brand-primary);
+  cursor: pointer;
+}
+
+.btn-download:hover {
+  background: var(--brand-primary);
+  color: white;
+}
+
+/* Badges & Tags */
+.badge-resolution {
+  background: var(--brand-primary);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.badge-featured {
+  background: var(--brand-soft);
+  color: var(--brand-primary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--brand-primary);
+}
+
+.tag-category {
+  background: white;
+  color: var(--brand-text);
+  font-size: 0.75rem;
+  padding: 6px 12px;
+  border-radius: 4px;
+  border: 1px solid var(--brand-accent);
+  transition: all 0.2s ease;
+}
+
+.tag-category:hover {
+  background: var(--brand-surface);
+  border-color: var(--brand-primary);
+}
+
+/* Search Elements */
+.search-brand {
+  background: white;
+  border: 2px solid var(--brand-surface);
+  border-radius: 6px;
+  padding: 16px 20px;
+  font-size: 16px;
+  transition: border-color 0.2s ease;
+}
+
+.search-brand:focus {
+  outline: none;
+  border-color: var(--brand-accent);
+}
+
+/* Stats & Metrics */
+.stat-number {
+  color: var(--brand-primary);
+  font-weight: 800;
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.stat-label {
+  color: var(--brand-accent);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.875rem;
+}
+
+/* Loading States */
+.loading-shimmer {
+  background: var(--brand-surface);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Section Backgrounds */
+.section-alt {
+  background: var(--brand-surface);
+  border-top: 2px solid var(--brand-accent);
+}
+
+/* Mobile Bottom Navigation */
+.bottom-nav-brand {
+  background: white;
+  border-top: 2px solid var(--brand-surface);
+}
+
+.bottom-nav-brand.dark {
+  background: var(--brand-text);
+  border-top: 2px solid var(--brand-accent);
 }
 
 /* High contrast mode support */

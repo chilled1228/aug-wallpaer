@@ -203,7 +203,6 @@ export default function SmartImage({
           isLoaded ? 'opacity-100' : 'opacity-0'
         }`}
         sizes={sizes || CDNService.generateSizesAttribute()}
-        srcSet={priority ? responsiveSrcSet : undefined}
         priority={priority}
         quality={getOptimizedQuality()}
         placeholder={placeholder}
@@ -225,7 +224,7 @@ export default function SmartImage({
       
       {/* Network speed indicator (development only) */}
       {process.env.NODE_ENV === 'development' && (
-        <div className="absolute top-2 right-2 text-xs bg-black bg-opacity-50 text-white px-2 py-1 rounded">
+        <div className="absolute top-2 right-2 text-xs bg-brand text-white px-2 py-1 rounded">
           {networkSpeed}
         </div>
       )}
@@ -268,7 +267,7 @@ export class ImagePreloader {
     }
 
     const promise = new Promise<void>((resolve, reject) => {
-      const img = new Image();
+      const img = new window.Image();
       img.onload = () => resolve();
       img.onerror = () => reject(new Error(`Failed to preload image: ${optimizedSrc}`));
       img.src = optimizedSrc;

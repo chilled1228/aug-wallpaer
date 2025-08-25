@@ -176,16 +176,7 @@ export default function SocialProof({
             </div>
           )}
           
-          {/* New badge */}
-          {(() => {
-            const ageInDays = (Date.now() - new Date(wallpaper.created_at).getTime()) / (1000 * 60 * 60 * 24);
-            return ageInDays < 7;
-          })() && (
-            <div className="flex items-center space-x-1 px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
-              <Zap className="w-3 h-3" />
-              <span>New</span>
-            </div>
-          )}
+          {/* New badge removed per request */}
         </div>
       </div>
 
@@ -268,8 +259,6 @@ function SocialProofMessages({
     const hour = new Date().getHours();
     if (hour >= 9 && hour <= 17) {
       proofMessages.push('Downloaded by professionals worldwide');
-    } else {
-      proofMessages.push('Perfect for your evening setup');
     }
 
     setMessages(proofMessages);

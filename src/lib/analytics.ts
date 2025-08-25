@@ -100,68 +100,7 @@ export class Analytics {
     }
   }
 
-  // Get analytics data (for admin dashboard)
-  static async getAnalytics(timeframe: 'day' | 'week' | 'month' = 'week') {
-    const now = new Date();
-    const startDate = new Date();
-    
-    switch (timeframe) {
-      case 'day':
-        startDate.setDate(now.getDate() - 1);
-        break;
-      case 'week':
-        startDate.setDate(now.getDate() - 7);
-        break;
-      case 'month':
-        startDate.setMonth(now.getMonth() - 1);
-        break;
-    }
 
-    try {
-      // Get page views
-      const { data: pageViews } = await supabase
-        .from('page_views')
-        .select('*')
-        .gte('viewed_at', startDate.toISOString());
-
-      // Get downloads
-      const { data: downloads } = await supabase
-        .from('wallpaper_downloads')
-        .select('*')
-        .gte('downloaded_at', startDate.toISOString());
-
-      // Get popular wallpapers
-      const { data: popularWallpapers } = await supabase
-        .from('wallpapers')
-        .select('id, title, download_count, average_rating')
-        .order('download_count', { ascending: false })
-        .limit(10);
-
-      // Get search queries
-      const { data: searches } = await supabase
-        .from('search_queries')
-        .select('*')
-        .gte('searched_at', startDate.toISOString());
-
-      return {
-        pageViews: pageViews || [],
-        downloads: downloads || [],
-        popularWallpapers: popularWallpapers || [],
-        searches: searches || [],
-        summary: {
-          totalPageViews: pageViews?.length || 0,
-          totalDownloads: downloads?.length || 0,
-          totalSearches: searches?.length || 0,
-          uniqueVisitors: new Set(pageViews?.map(pv => pv.user_ip)).size,
-          mobileTraffic: pageViews?.filter(pv => pv.device_type === 'mobile').length || 0,
-          conversionRate: pageViews?.length ? ((downloads?.length || 0) / pageViews.length * 100) : 0
-        }
-      };
-    } catch (error) {
-      console.error('Error fetching analytics:', error);
-      return null;
-    }
-  }
 }
 
 // Performance monitoring
@@ -182,7 +121,7 @@ export class PerformanceMonitor {
           // Time to Interactive
           tti: navigation.loadEventEnd - navigation.fetchStart,
           // Total page load time
-          loadTime: navigation.loadEventEnd - navigation.navigationStart,
+          loadTime: navigation.loadEventEnd - navigation.fetchStart,
           // DNS lookup time
           dnsTime: navigation.domainLookupEnd - navigation.domainLookupStart,
           // Server response time

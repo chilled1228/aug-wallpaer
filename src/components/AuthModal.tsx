@@ -107,7 +107,7 @@ export default function AuthModal({
       }
 
       if (result.error) {
-        setErrors({ general: result.error.message });
+        setErrors({ general: typeof result.error === 'string' ? result.error : 'An error occurred' });
       } else {
         if (mode === 'reset') {
           setErrors({ general: '' });
@@ -129,7 +129,7 @@ export default function AuthModal({
     try {
       const result = await AuthService.signInWithProvider(provider);
       if (result.error) {
-        setErrors({ general: result.error.message });
+        setErrors({ general: typeof result.error === 'string' ? result.error : 'OAuth sign in failed' });
       }
     } catch (error) {
       setErrors({ general: 'OAuth sign in failed' });

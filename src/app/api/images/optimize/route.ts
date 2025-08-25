@@ -26,7 +26,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Compress image if needed
-    const compressedFile = await ImageService.compressImage(file, quality / 100);
+    const compressedFile = await ImageService.compressImage(file, {
+      quality: quality / 100,
+      format: 'jpeg'
+    });
 
     // Upload and process image
     const processedImage = await ImageService.uploadImage({

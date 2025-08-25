@@ -7,7 +7,7 @@ export interface SEOData {
   keywords?: string[];
   image?: string;
   url?: string;
-  type?: 'website' | 'article' | 'product';
+  type?: 'website' | 'article';
   publishedTime?: string;
   modifiedTime?: string;
   author?: string;
@@ -304,7 +304,7 @@ export class SEOService {
       urls.push({
         url: `${config.app.url}/wallpaper/${wallpaper.id}`,
         lastModified: new Date(wallpaper.created_at),
-        changeFrequency: 'monthly' as const,
+        changeFrequency: 'weekly' as const,
         priority: 0.5,
       });
     });
